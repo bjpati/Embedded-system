@@ -1,0 +1,351 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2636
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fnil\fcharset0 Menlo-Bold;\f2\fnil\fcharset0 Menlo-Italic;
+}
+{\colortbl;\red255\green255\blue255;\red63\green127\blue95;\red127\green0\blue85;\red42\green0\blue255;
+\red0\green0\blue192;\red0\green80\blue50;}
+{\*\expandedcolortbl;;\csgenericrgb\c24706\c49804\c37255;\csgenericrgb\c49804\c0\c33333;\csgenericrgb\c16471\c0\c100000;
+\csgenericrgb\c0\c0\c75294;\csgenericrgb\c0\c31373\c19608;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 /*\cf0 \
+\cf2  * LCDTest.c\cf0 \
+\cf2  *\cf0 \
+\cf2  *  Created on: \ul Dec\ulnone  29, 2021\cf0 \
+\cf2  *      Author: \ul basharpati\cf0 \ulnone \
+\cf2  */\cf0 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 #include
+\f0\b0 \cf0  \cf4 "LCD.h"\cf0 \
+
+\f1\b \cf3 #include
+\f0\b0 \cf0  \cf4 "LCDTest.h"\cf0 \
+
+\f1\b \cf3 #include
+\f0\b0 \cf0  \cf4 "gpio.h"\cf0 \
+
+\f1\b \cf3 #include
+\f0\b0 \cf0  \cf4 "adc.h"\cf0 \
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 /**\cf0 \
+\cf2  * @brief test_program_lcd runs all the program \ul lcd\ulnone  test functions.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_program_lcd
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	test_lcd_clear();\
+	test_lcd_initialize();\
+	test_lcd_setROM();\
+	lcd_clear();\
+	test_backlight_set_white();\
+	test_write_char();\
+	HAL_Delay(1800);\
+	lcd_clear();\
+	test_write_string();\
+	HAL_Delay(1800);\
+	lcd_clear();\
+	test_lcd_set_position();\
+	lcd_clear();\
+	test_set_backlight();\
+\}\
+\pard\pardeftab720\partightenfactor0
+\cf2 /**\cf0 \
+\cf2  * @brief test_set_backlight a test function that turns white and green display color off, and turns on the red\cf0 \
+\cf2  * color to be able to set the \ul backlight\ulnone  strength via PWM. Function backlight_set_brightnes() is called in\cf0 \
+\cf2  * a while loop, to be able to test the PWM on the \ul microcontroller\ulnone . backlight_set_brightnes enables the\cf0 \
+\cf2  * \ul backlight\ulnone  strength to be to be modified via timer PWM.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_set_backlight
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	
+\f1\b \cf3 int
+\f0\b0 \cf0  i = 0;\
+	HAL_GPIO_WritePin(GPIOC, Disp_White_Pin, 
+\f2\i \cf5 GPIO_PIN_RESET
+\f0\i0 \cf0 );\
+	HAL_GPIO_WritePin(GPIOC, Disp_Green_Pin, 
+\f2\i \cf5 GPIO_PIN_RESET
+\f0\i0 \cf0 );\
+\
+	lcd_write_string(\cf4 "Try PWM"\cf0 );\
+\
+	
+\f1\b \cf3 while
+\f0\b0 \cf0 (i < 1000000)\{\
+		backlight_set_brightnes();\
+		i++;\
+	\}\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 /**\cf0 \
+\cf2  * @brief test_backlight_set_white a test function to turn on the white \ul backlight\ulnone  on the display. Calls\cf0 \
+\cf2  * function backlight_set_white. Test is seen as successful if display has white \ul backlight\ulnone .\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_backlight_set_white
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	backlight_set_white();\
+\pard\pardeftab720\partightenfactor0
+\cf0 \ul \ulc0 \}\ulnone \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \ul \ulc2 /**\cf0 \ulnone \
+\pard\pardeftab720\partightenfactor0
+\cf2  * @brief test_write_string a test function that send a string to lcd_write_string function\cf0 \
+\cf2  * and the string should be printed on the display.\cf0 \
+\cf2  * Test is seen as successful if string appear on display and "test_write_string succeed" is printed via\cf0 \
+\cf2  * serial communication.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_write_string
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	lcd_write_string(\cf4 "\ul Wassup\ulnone "\cf0 );\
+	\cf6 uint8_t\cf0 * test_write_string = \cf4 "test_write_string succeed\\n\\r"\cf0 ;\
+	transmit(test_write_string);\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 /**\cf0 \
+\cf2  * @brief test_write_char a test to write a stream of \ul hardcoded\ulnone  instructions of chars to the display.\cf0 \
+\cf2  * Test is seen as successful if chars appear on display and "test_write_char succeed" is printed via\cf0 \
+\cf2  * serial communication.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  *  @return void\cf0 \
+\cf2 */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_write_char
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	lcd_send_inst(0x80);\
+	lcd_send_data(0x77);\
+	lcd_send_data(0x61);\
+	lcd_send_data(0x64);\
+	lcd_send_data(0x64);\
+	lcd_send_data(0x61);\
+	lcd_send_data(0x70);\
+	lcd_send_data(0x3F);\
+	\cf6 uint8_t\cf0 * test_write_char = \cf4 "test_write_char succeed\\n\\r"\cf0 ;\
+	transmit(test_write_char);\
+\pard\pardeftab720\partightenfactor0
+\cf0 \ul \ulc0 \}\ulnone \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \ul \ulc2 /**\cf0 \ulnone \
+\pard\pardeftab720\partightenfactor0
+\cf2  * @brief test_display_initialize a test to initialize the display.\cf0 \
+\cf2  * Test is seen as successful if "test_lcd_initialize succeed" is printed via\cf0 \
+\cf2  * serial communication.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_initialize
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	lcd_initialize();\
+	\cf6 uint8_t\cf0 * test_lcd_initialize = \cf4 "test_lcd_initialize succeed\\n\\r"\cf0 ;\
+	transmit(test_lcd_initialize);\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 /**\cf0 \
+\cf2  * @brief test_lcd_rom test to set the LCD ROM with function call to lcd_setROM.\cf0 \
+\cf2  * Test is seen as successful if "test_lcd_setROM succeed" is printed via\cf0 \
+\cf2  * serial communication.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_setROM
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	lcd_setROM();\
+	\cf6 uint8_t\cf0 * test_lcd_rom = \cf4 "test_lcd_setROM succeed\\n\\r"\cf0 ;\
+	transmit(test_lcd_rom);\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 /**\cf0 \
+\cf2  * @brief test_lcd_clear a test function to run lcd_clear.\cf0 \
+\cf2  * Test is seen as successful if the display is cleared with information and "test_lcd_clear succeed"\cf0 \
+\cf2  * is printed via serial communication.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_clear
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	lcd_clear();\
+	\cf6 uint8_t\cf0 * test_lcd_clear = \cf4 "test_lcd_clear succeed\\n\\r"\cf0 ;\
+	transmit(test_lcd_clear);\
+\}\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 /**\cf0 \
+\cf2  * @brief test_lcd_set_position prints string "Line x", where x is the number of the line\cf0 \
+\cf2  * it is going to be printed on. Test is seen as successful if the display show 4 lines with text and\cf0 \
+\cf2  * "test_lcd_clear succeed" is printed via serial communication.\cf0 \
+\cf2  * @\ul param\ulnone  void\cf0 \
+\cf2  * @return void\cf0 \
+\cf2  */\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_set_position
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 )\{\
+	lcd_set_position(LINE1);\
+	lcd_write_string(\cf4 "Line 1"\cf0 );\
+	HAL_Delay(1000);\
+	lcd_set_position(LINE2);\
+	lcd_write_string(\cf4 "Line 2"\cf0 );\
+	HAL_Delay(1000);\
+	lcd_set_position(LINE3);\
+	lcd_write_string(\cf4 "Line 3"\cf0 );\
+	HAL_Delay(1000);\
+	lcd_set_position(LINE4);\
+	lcd_write_string(\cf4 "Line 4"\cf0 );\
+	HAL_Delay(5000);\
+	\cf6 uint8_t\cf0 * test_lcd_set_position = \cf4 "test_lcd_set_position succeed\\n\\r"\cf0 ;\
+	transmit(test_lcd_set_position);\
+\}\
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 /*\cf0 \
+\cf2  * LCDTest.h\cf0 \
+\cf2  *\cf0 \
+\cf2  *  Created on: \ul Dec\ulnone  29, 2021\cf0 \
+\cf2  *      Author: \ul basharpati\cf0 \ulnone \
+\cf2  */\cf0 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf3 #ifndef
+\f0\b0 \cf0  INC_LCDTEST_H_\
+
+\f1\b \cf3 #define
+\f0\b0 \cf0  INC_LCDTEST_H_\
+\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_program_lcd
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_write_string
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_write_char
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_initialize
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_setROM
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_clear
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_lcd_set_position
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_set_backlight
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+
+\f1\b \cf3 void
+\f0\b0 \cf0  
+\f1\b test_backlight_set_white
+\f0\b0 (
+\f1\b \cf3 void
+\f0\b0 \cf0 );\
+\
+
+\f1\b \cf3 #endif
+\f0\b0 \cf0  \cf2 /* INC_LCDTEST_H_ */\cf0 \
+}
